@@ -1,16 +1,9 @@
 package de.einwesen.jdbc.poissf;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 
 public class DriverTest {
 
@@ -23,7 +16,7 @@ public class DriverTest {
 		try {
 			
 			System.out.println(String.format("%d", 1));
-			new PoiSSFDriver();
+			Class.forName(PoiSSFDriver.class.getName());
 			
 			final String path = "jdbc:poissf:file:///C:/Users/II1437/Desktop/Mappe1.xlsx";
 			
@@ -47,7 +40,7 @@ public class DriverTest {
 				}
 				System.out.println("------------------------------------");
 			}
-		} catch (SQLException e) {
+		} catch (Throwable e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
