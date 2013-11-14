@@ -22,8 +22,8 @@ try {
 	// it doesn't hold any resources..
 	rs = con.createStatement().executeQuery("SELECT * FROM Sheetname");
 	
-	// Information about datatypes is not supported, as teh could be different each row
-	// but columnName and count works
+	// Information about datatypes is not supported, as they could be different each row
+	// but columnnames and count works
 	ResultSetMetaData rsm = rs.getMetaData();
 
 	while (rs.next()) {
