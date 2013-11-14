@@ -120,10 +120,10 @@ public class PreparedPoiSSFStatement extends PoiSSFStatement implements Prepared
 		
 	}
 
+	@Deprecated
 	@Override
 	public void setUnicodeStream(int parameterIndex, InputStream x, int length) throws SQLException {
-		throw new SQLFeatureNotSupportedException();
-		
+		throw new SQLFeatureNotSupportedException();		
 	}
 
 	@Override

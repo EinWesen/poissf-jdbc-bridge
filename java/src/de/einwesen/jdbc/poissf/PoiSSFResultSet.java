@@ -242,7 +242,6 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 		}
 	}
 	
-	@SuppressWarnings("unused")
 	private void updateJavaDate(int columnIndex, java.util.Date x, int sqlType) throws SQLException {
 		throw new SQLFeatureNotSupportedException(PoiSSFDriver.NOT_IMPLEMENTED_YET);		
 	}
