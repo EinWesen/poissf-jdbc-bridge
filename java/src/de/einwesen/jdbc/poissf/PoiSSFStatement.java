@@ -258,4 +258,15 @@ public class PoiSSFStatement implements Statement {
 		return false;
 	}
 
+	@Override
+	public void closeOnCompletion() throws SQLException {
+		throw new SQLFeatureNotSupportedException();	
+	}
+
+	@Override
+	public boolean isCloseOnCompletion() throws SQLException {
+		//throw new SQLFeatureNotSupportedException();	
+		return false;
+	}
+
 }

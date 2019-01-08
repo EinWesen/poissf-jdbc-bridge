@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
@@ -45,6 +46,8 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 	private boolean closed = false;
 	private boolean wasNull = false;
 	private boolean wasDeleted = false;
+
+	private static Class<?> CASTABLE_CLASSES[] = {Date.class, Timestamp.class, Time.class};
 	
 	private PoiSSFResultSetMetaData metaData = null;
 	
@@ -163,7 +166,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 		}
 
 	}
-	
+
 	@Override
 	public boolean getBoolean(int columnIndex) throws SQLException {
 
@@ -899,5 +902,65 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 	public void updateNClob(int columnIndex, Reader reader) throws SQLException {
 		updateClob(columnIndex, reader);		
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+		if (type != null) {
+			Object o = null;
+			if (String.class.equals(type)) {
+				o = getString(columnIndex);
+			} else if (tryConvertByCast(type)) {
+				o = getObject(columnIndex);
+			} else if (Number.class.isAssignableFrom(type)) {
+				final BigDecimal bd = getBigDecimal(columnIndex);
+				if (bd != null) {
+					if (BigDecimal.class.equals(type)) {
+						o = bd;
+					} else if (Integer.class.equals(type)) {
+						o = Integer.valueOf(bd.intValue());
+					} else if (Double.class.equals(type)) {
+						o = Integer.valueOf(bd.intValue());
+					} else if (Long.class.equals(type)) {
+						o = Long.valueOf(bd.longValue());
+					} else if (Float.class.equals(type)) {
+						o = Float.valueOf(bd.toString());
+					} else if (BigInteger.class.equals(type)) {
+						o = bd.toBigInteger();
+					} else {
+						throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);
+					}
+				}				
+			} else if (Boolean.class.equals(type)) {
+				final boolean b = getBoolean(columnIndex);
+				if (!this.wasNull()) {
+					o = Boolean.valueOf(b);
+				}
+			} else {
+				throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);
+			}
+			
+			try {
+				return (T)o;
+			} catch (ClassCastException e) {
+				throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE, e);
+			}
+			
+		} else {
+			throw new SQLException(String.format(PoiSSFDriver.PARAMETER_MAY_NOT_BE_NULL, "type"));
+		}
+	}
+	
+	
+	private static boolean tryConvertByCast(Class<?> type) {
+		
+		for (Class<?> c: CASTABLE_CLASSES) {
+			if (c.equals(type)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}	
 	
 }

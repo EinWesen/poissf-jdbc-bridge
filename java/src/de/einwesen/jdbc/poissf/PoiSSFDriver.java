@@ -7,7 +7,9 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class PoiSSFDriver implements Driver {
 
@@ -20,6 +22,7 @@ public class PoiSSFDriver implements Driver {
 	public static final String RESULT_SET_NOT_UPDATETABLE = "ResultSet is not updatetable";
 	public static final String INVALID_COLUMN_INDEX = "Invalid columnIndex %d";
 	public static final String NOT_IMPLEMENTED_YET = "Not implemented yet";
+	public static final String PARAMETER_MAY_NOT_BE_NULL = "parameter %s my not be null";
 	
 	private static final String URL_PREFIX = "jdbc:poissf:";
 	private static final String URL_PATTERN = URL_PREFIX + "file:///.*\\.xls(x|$)";
@@ -31,6 +34,7 @@ public class PoiSSFDriver implements Driver {
             throw new ExceptionInInitializerError(ex);
         }
     }
+
     
 	private PoiSSFDriver() {}
 	
@@ -71,6 +75,11 @@ public class PoiSSFDriver implements Driver {
 	@Override
 	public boolean jdbcCompliant() {
 		return false;
+	}
+
+	@Override
+	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		throw new SQLFeatureNotSupportedException();
 	}
 
 }

@@ -26,6 +26,7 @@ import java.sql.Struct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executor;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -378,5 +379,26 @@ public class PoiSSFConnection implements Connection {
 	public String getSchema() {
 		final String[] parts = this.workbookURL.getPath().split("/");
 		return parts[parts.length-1];
+	}
+
+	@Override
+	public void setSchema(String schema) throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+		
+	}
+
+	@Override
+	public void abort(Executor executor) throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+	}
+
+	@Override
+	public void setNetworkTimeout(Executor executor, int milliseconds) throws SQLException {
+		throw new SQLFeatureNotSupportedException();
+	}
+
+	@Override
+	public int getNetworkTimeout() throws SQLException {
+		return 0;
 	}
 }

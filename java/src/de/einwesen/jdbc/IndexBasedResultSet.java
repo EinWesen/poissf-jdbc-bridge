@@ -415,4 +415,8 @@ public abstract class IndexBasedResultSet implements ResultSet {
 		updateNClob(findColumn(columnLabel), reader);		
 	}
 
+	@Override
+	public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+		return getObject(findColumn(columnLabel), type);
+	}	
 }
