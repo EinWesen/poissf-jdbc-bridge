@@ -1,5 +1,6 @@
 package de.einwesen.jdbc.poissf;
 
+import java.math.BigDecimal;
 import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -228,7 +229,22 @@ public class PoiSSFResultSetMetaData implements ResultSetMetaData {
 
 	@Override
 	public String getColumnClassName(int column) throws SQLException {
-		return Object.class.getName();
+		
+		switch (getColumnJDBCType(column)) {
+			case BOOLEAN:
+				return Boolean.class.getName();
+			case TIMESTAMP:
+				return java.util.Date.class.getName();
+			case NUMERIC:
+				return BigDecimal.class.getName();
+			case VARCHAR:
+				return String.class.getName();
+			case NULL:				
+			case DATALINK:
+			case OTHER:
+			default:
+				return Object.class.getName();
+		}
 	}
 	
 	public int getColumnIndex(String label) throws SQLException {
