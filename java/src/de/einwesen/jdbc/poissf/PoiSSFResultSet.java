@@ -152,7 +152,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 		        	if (HSSFDateUtil.isCellDateFormatted(cell)) {
 		        		return HSSFDateUtil.getJavaDate(cell.getNumericCellValue() /* , timezone */);
 		        	} else {
-		        		return BigDecimal.valueOf(cell.getNumericCellValue());		        		
+		        		return new BigDecimal(String.valueOf(cell.getNumericCellValue()));		        		
 		        	}
 		        case Cell.CELL_TYPE_STRING:
 		            return cell.getStringCellValue();
@@ -186,7 +186,14 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 		        	this.wasNull = true;
 		            return false;		            
 		        case Cell.CELL_TYPE_STRING:
-		        	throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);
+		        	final String tmp = cell.getStringCellValue();
+		        	if ("1".equals(tmp)) {
+		        		return true;
+		        	} else if ("0".equals(tmp)){
+		        		return false;
+		        	} else {
+		        		throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);		        		
+		        	}
 		        case Cell.CELL_TYPE_ERROR:
 		        case Cell.CELL_TYPE_FORMULA:  // CELL_TYPE_FORMULA will never occur
 		        default:
@@ -214,6 +221,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 				return (byte)cell.getStringCellValue().charAt(0);
 			case Cell.CELL_TYPE_BOOLEAN:			
 	        case Cell.CELL_TYPE_NUMERIC:
+        		throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);		        		
 	        case Cell.CELL_TYPE_FORMULA:  // CELL_TYPE_FORMULA will never occur
 	        default:
 	            throw new SQLException(PoiSSFDriver.ERROR_RETRIEVING_DATA);
@@ -239,6 +247,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 				return cell.getStringCellValue().getBytes();
 			case Cell.CELL_TYPE_BOOLEAN:			
 	        case Cell.CELL_TYPE_NUMERIC:
+        		throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);		        		
 	        case Cell.CELL_TYPE_FORMULA:  // CELL_TYPE_FORMULA will never occur
 	        default:
 	            throw new SQLException(PoiSSFDriver.ERROR_RETRIEVING_DATA);
@@ -928,7 +937,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 					} else if (BigInteger.class.equals(type)) {
 						o = bd.toBigInteger();
 					} else {
-						throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);
+						throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE, new IllegalArgumentException(type.getClass().getName()));
 					}
 				}				
 			} else if (Boolean.class.equals(type)) {
@@ -937,7 +946,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 					o = Boolean.valueOf(b);
 				}
 			} else {
-				throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE);
+				throw new SQLException(PoiSSFDriver.INCOMPATIBLE_DATATYPE, new IllegalArgumentException(type.getClass().getName()));
 			}
 			
 			try {
