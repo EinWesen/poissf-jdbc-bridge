@@ -13,17 +13,17 @@ import java.util.logging.Logger;
 
 public class PoiSSFDriver implements Driver {
 
-	public static final String CONNECT_ERROR = "Could not create connection";
-	public static final String CONNECTION_IS_CLOSED = "Connection is closed";
-	public static final String STATEMENT_IS_CLOSED = "Statement is closed";
-	public static final String RESULTSET_IS_CLOSED = "ResultSet is closed";
-	public static final String CURSOR_ON_INVALID_ROW = "Cursor is not on a valid row";
-	public static final String ERROR_RETRIEVING_DATA = "Error retrieving data from cell";
-	public static final String INCOMPATIBLE_DATATYPE = "Incompatible datatype in cell";
-	public static final String RESULT_SET_NOT_UPDATETABLE = "ResultSet is not updatetable";
-	public static final String INVALID_COLUMN_INDEX = "Invalid columnIndex %d";
-	public static final String NOT_IMPLEMENTED_YET = "Not implemented yet";
-	public static final String PARAMETER_MAY_NOT_BE_NULL = "parameter %s my not be null";
+	/* package-private */ static final String CONNECT_ERROR = "Could not create connection";
+	/* package-private */ static final String CONNECTION_IS_CLOSED = "Connection is closed";
+	/* package-private */ static final String STATEMENT_IS_CLOSED = "Statement is closed";
+	/* package-private */ static final String RESULTSET_IS_CLOSED = "ResultSet is closed";
+	/* package-private */ static final String CURSOR_ON_INVALID_ROW = "Cursor is not on a valid row";
+	/* package-private */ static final String ERROR_RETRIEVING_DATA = "Error retrieving data from cell";
+	/* package-private */ static final String INCOMPATIBLE_DATATYPE = "Incompatible datatype in cell";
+	/* package-private */ static final String RESULT_SET_NOT_UPDATETABLE = "ResultSet is not updatetable";
+	/* package-private */ static final String INVALID_COLUMN_INDEX = "Invalid columnIndex %d";
+	/* package-private */ static final String NOT_IMPLEMENTED_YET = "Not implemented yet";
+	/* package-private */ static final String PARAMETER_MAY_NOT_BE_NULL = "parameter %s my not be null";
 	
 	private static final String URL_PREFIX = "jdbc:poissf:";
 	private static final String URL_PATTERN = URL_PREFIX + "file:///.*\\.xls(x|$)";
