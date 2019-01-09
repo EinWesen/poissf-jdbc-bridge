@@ -39,12 +39,16 @@ public class PoiSSFConnection implements Connection {
 	
 	private /*XSSF*/Workbook excelWorkbook = null;
 	private boolean readOnly = true;
+	private boolean resultExtendedMetadataEnabled = false;
 	private URL workbookURL = null;
 	
 	private final Map<String, Class<?>> typeMap = new HashMap<String, Class<?>>(0);
 	private SQLWarning rootWarning = null;
-	
+
 	public PoiSSFConnection(URL file) throws IOException, InvalidFormatException {
+		this(file, null);
+	}
+	public PoiSSFConnection(URL file, Properties info) throws IOException, InvalidFormatException {
 		
 		this.workbookURL = file;
 		
@@ -60,6 +64,10 @@ public class PoiSSFConnection implements Connection {
 					// Do nothing
 				}
 			}
+		}
+		
+		if (info != null) {
+			this.resultExtendedMetadataEnabled = "true".equalsIgnoreCase(info.getProperty(PoiSSFDriver.CONNECTION_PROPERTY_RS_EXTENDED_METADATA));
 		}
 		
 	}
@@ -372,7 +380,7 @@ public class PoiSSFConnection implements Connection {
 		throw new SQLFeatureNotSupportedException();
 	}
 
-	public Workbook getWorkbook() {
+	public Workbook getPoiWorkbook() {
 		return this.excelWorkbook;
 	}
 	
@@ -401,4 +409,9 @@ public class PoiSSFConnection implements Connection {
 	public int getNetworkTimeout() throws SQLException {
 		return 0;
 	}
+	
+	/* package-private */ boolean isResultExtendedMetadataEnabled() {
+		return resultExtendedMetadataEnabled;
+	}
+
 }

@@ -54,9 +54,9 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 	
 	public PoiSSFResultSet(String sql, PoiSSFStatement parentStatement) throws SQLException {
 		this.parentStatement = parentStatement;
-		this.sheet = parentStatement.getConnection().getWorkbook().getSheet(parentStatement.getConnection().nativeSQL(sql));
+		this.sheet = parentStatement.getConnection().getPoiWorkbook().getSheet(parentStatement.getConnection().nativeSQL(sql));
 		
-		this.evaluator = parentStatement.getConnection().getWorkbook().getCreationHelper().createFormulaEvaluator();
+		this.evaluator = parentStatement.getConnection().getPoiWorkbook().getCreationHelper().createFormulaEvaluator();
 		
 		// Owing to idiosyncrasies in the excel file format, if the result of calling this method is zero, you can't tell if that means there are zero rows on the sheet, or one at position zero. For that case, additionally call getPhysicalNumberOfRows() to tell if there is a row at position zero or not.
 		this.rowCount = sheet.getLastRowNum() + 1;
@@ -378,7 +378,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 	@Override
 	public PoiSSFResultSetMetaData getMetaData() throws SQLException {
 		if (metaData == null) {
-			metaData = PoiSSFResultSetMetaData.getInstance(sheet, this, false);
+			metaData = PoiSSFResultSetMetaData.getInstance(this);
 		}
 		return metaData;
 	}

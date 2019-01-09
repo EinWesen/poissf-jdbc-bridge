@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 
 public class PoiSSFDriver implements Driver {
 
+	public static final String CONNECTION_PROPERTY_RS_EXTENDED_METADATA = "resultset.extended_metadata"; 
+	
 	/* package-private */ static final String CONNECT_ERROR = "Could not create connection";
 	/* package-private */ static final String CONNECTION_IS_CLOSED = "Connection is closed";
 	/* package-private */ static final String STATEMENT_IS_CLOSED = "Statement is closed";
