@@ -18,7 +18,7 @@ public class DriverTest {
 			System.out.println(String.format("%d", 1));
 			Class.forName(PoiSSFDriver.class.getName());
 			
-			final String path = "jdbc:poissf:file:///C:/Users/II1437/Desktop/Mappe1.xlsx";
+			final String path = "jdbc:poissf:file:///C:/Users/User/Desktop/file1.xlsx";
 			
 			Connection con = DriverManager.getConnection(path);
 
