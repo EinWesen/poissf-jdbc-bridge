@@ -1,10 +1,10 @@
 package de.einwesen.jdbc.poissf;
 
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,18 +25,35 @@ public class PoiSSFResultSetMetaData implements ResultSetMetaData {
 	private boolean readOnly = true;
 	
 	private List<String> columnNames = null;
+		
+	private PoiSSFResultSet parentResultSet = null;
+
+	/**
+	 * Constructe a new instance, which hold a reference to the
+	 * result set. columntype are dynamically derived from the current 
+	 * row in the result set instead of returning the same static value
+	 * for all columns.
+	 * 
+	 * @param rs 
+	 * @return
+	 * @throws SQLException
+	 */
+	public static ResultSetMetaData getDataSensitiveInstance(PoiSSFResultSet rs) throws SQLException {
+		return getInstance(rs.getPoiSheet(), rs, true);
+	}
 	
-	public static PoiSSFResultSetMetaData getInstance(Sheet sheet, PoiSSFResultSet rs) throws SQLException {
+	/* Package-Private */ static PoiSSFResultSetMetaData getInstance(Sheet sheet, PoiSSFResultSet rs, boolean dataSensitive) throws SQLException {
 		if (sheet instanceof XSSFSheet) {
-			return new PoiSSFResultSetMetaData((XSSFSheet)sheet, rs);
+			return new PoiSSFResultSetMetaData((XSSFSheet)sheet, rs, dataSensitive);
 		} else if (sheet instanceof HSSFSheet) {
-			return new PoiSSFResultSetMetaData((HSSFSheet)sheet, rs);
+			return new PoiSSFResultSetMetaData((HSSFSheet)sheet, rs, dataSensitive);
 		} else {
 			return null;
 		}
 	}
 		
-	private PoiSSFResultSetMetaData(XSSFSheet sheet, PoiSSFResultSet rs) throws SQLException {
+	private PoiSSFResultSetMetaData(XSSFSheet sheet, PoiSSFResultSet rs, boolean dataSensitive) throws SQLException {
+			
 		final String[] sheetDimensions = sheet.getCTWorksheet().getDimension().getRef().split(":");
 
 		final String rightColName = sheetDimensions[1].replaceAll("\\d", "");
@@ -53,9 +70,13 @@ public class PoiSSFResultSetMetaData implements ResultSetMetaData {
 			columnNames.add(CellReference.convertNumToColString(i));
 		}
 		
+		if (dataSensitive) {
+			this.parentResultSet = rs;
+		}
+		
 	}
 	
-	private PoiSSFResultSetMetaData(HSSFSheet sheet, PoiSSFResultSet rs) throws SQLException {
+	private PoiSSFResultSetMetaData(HSSFSheet sheet, PoiSSFResultSet rs, boolean dataSensitive) throws SQLException {
 		this.catalog = rs.getStatement().getConnection().getCatalog();
 		this.schema = rs.getStatement().getConnection().getSchema();
 		this.tableName = sheet.getSheetName();
@@ -186,14 +207,21 @@ public class PoiSSFResultSetMetaData implements ResultSetMetaData {
 		return this.catalog;
 	}
 
+	public JDBCType getColumnJDBCType(int column) throws SQLException {
+		if (this.parentResultSet != null) {
+			return this.parentResultSet.getCellJDBCTypeAtCurrentRow(column);
+		} else {
+			return JDBCType.JAVA_OBJECT;
+		}
+	}
 	@Override
-	public int getColumnType(int column) throws SQLException {
-		return Types.OTHER; // Infact: Unknown
+	public int getColumnType(int column) throws SQLException {		
+		return getColumnJDBCType(column).getVendorTypeNumber().intValue();
 	}
 
 	@Override
 	public String getColumnTypeName(int column) throws SQLException {
-		return "UNKNOWN";
+		return getColumnJDBCType(column).getName();
 	}
 
 	@Override

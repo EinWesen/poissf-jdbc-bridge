@@ -11,6 +11,7 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Date;
+import java.sql.JDBCType;
 import java.sql.NClob;
 import java.sql.Ref;
 import java.sql.ResultSet;
@@ -74,6 +75,10 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 		
 		if (this.parentStatement.isClosed()) {
 			throw new SQLException(PoiSSFDriver.STATEMENT_IS_CLOSED);			
+		}
+		
+		if (this.closed) {
+			throw new SQLException(PoiSSFDriver.RESULTSET_IS_CLOSED);
 		}
 	}
 	
@@ -144,6 +149,8 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 		if (cellType == Cell.CELL_TYPE_FORMULA) {
 			cellType = evaluator.evaluateInCell(cell).getCellType();
 		}
+		
+
 		
 		switch (cellType) {
 		        case Cell.CELL_TYPE_BOOLEAN:
@@ -371,7 +378,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 	@Override
 	public PoiSSFResultSetMetaData getMetaData() throws SQLException {
 		if (metaData == null) {
-			metaData = PoiSSFResultSetMetaData.getInstance(sheet, this);
+			metaData = PoiSSFResultSetMetaData.getInstance(sheet, this, false);
 		}
 		return metaData;
 	}
@@ -440,7 +447,7 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 
 	@Override
 	public int getRow() throws SQLException {
-		if  (!this.isBeforeFirst() && !this.isAfterLast()) {
+		if  (this.currentRow != null && !this.isBeforeFirst() && !this.isAfterLast()) {
 			return this.currentRowIndex;			
 		} else {
 			return 0;
@@ -972,4 +979,43 @@ public class PoiSSFResultSet extends IndexBasedResultSet implements ResultSet {
 		return false;
 	}	
 	
+	/* Package-private */ JDBCType getCellJDBCTypeAtCurrentRow(int columnIndex) throws SQLException {
+		checkOpen();
+		checkValidRow();
+
+		final Cell cell = getCell(columnIndex);
+
+		int cellType = cell.getCellType();
+		if (cellType == Cell.CELL_TYPE_FORMULA) {
+			cellType = evaluator.evaluateInCell(cell).getCellType();
+		}
+
+		switch (cellType) {
+		case Cell.CELL_TYPE_BOOLEAN:
+			return JDBCType.BOOLEAN;
+		case Cell.CELL_TYPE_NUMERIC:
+			if (HSSFDateUtil.isCellDateFormatted(cell)) {
+				return JDBCType.TIMESTAMP;
+			} else {
+				return JDBCType.NUMERIC;
+			}
+		case Cell.CELL_TYPE_STRING:
+			return JDBCType.VARCHAR;
+
+		case Cell.CELL_TYPE_BLANK:
+			return JDBCType.NULL;
+
+		case Cell.CELL_TYPE_ERROR:
+		case Cell.CELL_TYPE_FORMULA: // CELL_TYPE_FORMULA will never occur
+			return JDBCType.DATALINK;
+		default:
+
+			throw new SQLException(PoiSSFDriver.ERROR_RETRIEVING_DATA);
+		}
+	}
+	
+	/* Package-private */ Sheet getPoiSheet() {
+		return this.sheet;
+	}
+
 }

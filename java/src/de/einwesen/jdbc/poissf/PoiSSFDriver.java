@@ -16,6 +16,7 @@ public class PoiSSFDriver implements Driver {
 	public static final String CONNECT_ERROR = "Could not create connection";
 	public static final String CONNECTION_IS_CLOSED = "Connection is closed";
 	public static final String STATEMENT_IS_CLOSED = "Statement is closed";
+	public static final String RESULTSET_IS_CLOSED = "ResultSet is closed";
 	public static final String CURSOR_ON_INVALID_ROW = "Cursor is not on a valid row";
 	public static final String ERROR_RETRIEVING_DATA = "Error retrieving data from cell";
 	public static final String INCOMPATIBLE_DATATYPE = "Incompatible datatype in cell";
